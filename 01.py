@@ -197,15 +197,15 @@ input = """1945
 1933
 1982
 1809
-1812
-"""
+1812"""
 
 def parse(input):
-    res = input.split('\n')[:-1]
+    res = input.split('\n')
     res = [int(num) for num in res]
     return res
 
-def get_complement(target, nums):
+# O(n), Use set for constant look up times
+def complement_product(target, nums):
     num_set = set(nums)
     for num in nums:
         complement = target - num
@@ -218,13 +218,13 @@ if __name__ == "__main__":
     nums = parse(input)
 
     # part 1
-    complement = get_complement(2020, nums)
+    complement = complement_product(2020, nums)
     print(complement)
 
     # part 2
     for num in nums:
         complement1 = 2020 - num
-        complement2 = get_complement(complement1, nums)
+        complement2 = complement_product(complement1, nums)
         if complement2:
             print(num * complement2)
             break
