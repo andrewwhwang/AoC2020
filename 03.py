@@ -321,22 +321,13 @@ input = """......##....#...#..#.#....#....
 .....#.##....#..##...#...#....#
 ..#.....#...........#..#..##...
 ..#..#.......#....#....###.#..."""
+from operator import mul
+from functools import reduce
 
 def get_trees(right, down, lines):
     # dimensions of forest
     width, height = len(lines[0]), len(lines)
-    
-    counter = 0
-    hor_pos = 0
-    
-    # iterate through rows according to slope
-    for ver_pos in range(down, height, down):
-        # get horizontal component of slope
-        hor_pos += right
-        hor_pos %= width
-        if lines[ver_pos][hor_pos] == '#':
-            counter += 1
-    return counter
+    return sum([lines[i*down][i*right % width] == '#' for i in range(1, height//down)])
 
 if __name__ == "__main__":
     lines = input.split('\n')
@@ -345,7 +336,6 @@ if __name__ == "__main__":
     print(get_trees(3, 1, lines))
 
     # part 2
-    total = 1
-    for right, down in [(1,1), (3,1), (5,1), (7,1), (1,2)]:
-        total *= get_trees(right, down, lines)
+    slopes =  [(1,1), (3,1), (5,1), (7,1), (1,2)]
+    total = reduce(mul, [get_trees(right, down, lines) for right, down in slopes])
     print(total)
