@@ -1,5 +1,3 @@
-import numpy as np
-
 def get_id(line):
     row = line[:7]
     col = line[7:]
@@ -15,11 +13,9 @@ if __name__ == "__main__":
         lines = file.read().split('\n')
 
     # part 1
-    id_list = np.array([get_id(line) for line in lines])
-    print(np.max(id_list))
+    id_list = [get_id(line) for line in lines]
+    print(max(id_list))
 
     # part 2
-    id_list = np.sort(id_list)
-    diff = id_list[1:] - id_list[:-1]
-    index = np.where(diff == 2)
-    print(id_list[index][0] + 1)
+    first, last = min(id_list), max(id_list)
+    print((sum(range(first, last+1)) - sum(id_list)))
