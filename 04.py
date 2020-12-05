@@ -1097,24 +1097,6 @@ ecl:oth hcl:#602927 eyr:2025 iyr:2013 hgt:151cm byr:1992 pid:812583062"""
 
 import re
 
-REQUIRED = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'}
-EYE = {'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'}
-
-def has_fields(passport):
-    return REQUIRED.issubset(passport)
-
-def fields_valid(passport):
-    return 1920 <= int(passport['byr']) <= 2020 and \
-           2010 <= int(passport['iyr']) <= 2020  and \
-           2020 <= int(passport['eyr']) <= 2030  and \
-           4 <= len(passport['hgt']) <= 5 and passport['hgt'][:-2].isdigit() and \
-           ((passport['hgt'][-2:] == 'in' and 59 <= int(passport['hgt'][:-2]) <= 76) or \
-           (passport['hgt'][-2:] == 'cm' and 150 <= int(passport['hgt'][:-2]) <= 193)) and \
-           re.match(r'^#[a-f0-9]{6}$', passport['hcl']) is not None  and \
-           passport['ecl'] in EYE  and \
-           len(passport['pid']) == 9 and passport['pid'].isdigit()
-
-
 def parse(lines):
     input_split = lines.split('\n\n')
     passports = []
@@ -1126,8 +1108,24 @@ def parse(lines):
 
 if __name__ == "__main__":
     passports = parse(input)
+
+    requirements = {
+                    'byr': r'^19[2-9][0-9]$|^200[0-2]$',
+                    'iyr': r'^(201[0-9]|2020)$',
+                    'eyr': r'^202[0-9]$|2030$',
+                    'hgt': r'^1(([5-8][0-9])|9[0-3])cm$|^(59|6[0-9]|7[0-6])in$',
+                    'hcl': r'^#[a-f0-9]{6}$',
+                    'ecl': r'^(amb|blu|brn|gry|grn|hzl|oth)$',
+                    'pid': r'^\d{9}$'
+                    }
+    fields = set(requirements.keys())
+
     # part 1
-    print(sum([has_fields(passport) for passport in passports]))
+    print(sum([fields.issubset(passport) for passport in passports]))
+
+    
+    def is_valid(passport):
+        return all([re.match(req, passport.get(field, "")) != None for field, req in requirements.items()])
 
     # part 2
-    print(sum([has_fields(passport) and fields_valid(passport) for passport in passports]))
+    print(sum([is_valid(passport) for passport in passports]))
