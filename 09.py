@@ -4,7 +4,7 @@ if __name__ == "__main__":
     lines = [int(n) for n in lines]
     preamble = {n for n in lines[:25]}
 
-    # part 1
+    # part 1 O(kn)
     error = 0
     for first, line in enumerate(lines[25:]):
         if not any([line - p in preamble and line != p for p in preamble]):
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         
     print(error)
 
-    # part 2
+    # part 2 O(n)
     start, end = 0,0
     total = 0
     while total != error:
