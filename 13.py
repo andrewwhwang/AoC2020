@@ -1,5 +1,5 @@
-
 from functools import reduce
+
 # fermat's little theorem
 def inverse(a, m):
     """
@@ -27,7 +27,6 @@ if __name__ == "__main__":
     # part 2
     # chinese remainder
     # https://www.youtube.com/watch?v=zIFehsBHB8o
-
     total_product = reduce(lambda a, b: a*b, bus_IDs)
     answer = 0
     for i, id in enumerate(lines[1].split(',')):
@@ -36,8 +35,8 @@ if __name__ == "__main__":
         id = int(id)
 
         remainder = id - i
-        Ni = total_product // id
-        answer += remainder * Ni * inverse(Ni, id)
+        n = total_product // id
+        answer += remainder * n * inverse(n, id)
 
     answer %= total_product
     print(answer)
