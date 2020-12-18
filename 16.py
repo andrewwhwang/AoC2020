@@ -1,34 +1,45 @@
 import re
 
-def get_invalid(rules, nearby):
-    # build valid set
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
+
+
+def get_valid_set(rules):
     valid = set()
-    for v in rules.values():
-        valid |= set(range(v[0],v[1]+1)) | set(range(v[2],v[3]+1))
+    for t1, t2, t3, t4 in rules:
+        valid |= set(range(t1, t2 + 1))
+        valid |= set(range(t3, t4 + 1))
+    return valid
 
-    total = 0
-    valid_tickets = []
-    for line in nearby:
-        line_total = sum([num for num in line if num not in valid])
-
-        if line_total == 0:
-            valid_tickets.append(line)
-        total += line_total
-
-    return total, valid_tickets
 
 if __name__ == "__main__":
+
     with open('inputs/16.txt', 'r') as file:
-        lines = file.read()
+        lines = file.read().split('\n')
 
-    rules, my_ticket, nearby = lines.split("\n\n")
+    rules = [list(map(int, re.findall(r'\d+', x))) for x in lines[:20]]
+    mine = np.array([int(x) for x in lines[22].split(',')], dtype=np.int64)
+    nearby = [list(map(int, re.findall(r'\d+', x))) for x in lines[25:]]
 
-    rules = {rule.split(':')[0]: list(map(int, re.findall(r'\d+', rule))) for rule in rules.split('\n')}
-    my_ticket = list(map(int, my_ticket.split('\n')[1].split(',')))
-    nearby = [list(map(int, line.split(','))) for line in nearby.split('\n')[1:]]
-
-
-    total, valid_tickets = get_invalid(rules, nearby)
+    # Part 1
+    valid = get_valid_set(rules)
+    total = 0
+    for line in nearby:
+        for num in line:
+            if num not in valid:
+                total += num
     print(total)
 
-    print(len(valid_tickets))
+    # Part 2
+    nearby = [line for line in nearby if all(num in valid for num in line)]
+
+    graph = []
+    for j in range(len(nearby[0])):
+        check = []
+        for t1, t2, t3, t4 in rules:
+            check.append(all((t1 <= l[j] <= t2) or (t3 <= l[j] <= t4) for l in nearby))
+        graph.append(check)
+
+    m = maximum_bipartite_matching(csr_matrix(graph))
+    print(mine[m[:6]].prod())
